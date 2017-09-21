@@ -12,14 +12,22 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final PersonRepository personRepository;
+   // private final UserDetailsService userDetailsService;
 
     @Autowired
-    public UserServiceImpl(PersonRepository personRepository) {
+    public UserServiceImpl(PersonRepository personRepository/*, UserDetailsService userDetailsService*/) {
         this.personRepository = personRepository;
+       // this.userDetailsService = userDetailsService;
     }
 
     @Override
     public Person addUser(Person person) {
+        //TODO find better solution
+        /*if (userDetailsService instanceof InMemoryUserDetailsManager){
+            InMemoryUserDetailsManager inMemory = (InMemoryUserDetailsManager) userDetailsService;
+            inMemory.createUser(withUsername(person.getLogin()).password
+                    (person.getPassword()).roles(person.getRole().toString()).build());
+        }*/
         return personRepository.save(person);
     }
 

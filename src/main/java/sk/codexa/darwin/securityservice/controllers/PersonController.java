@@ -2,7 +2,13 @@ package sk.codexa.darwin.securityservice.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import sk.codexa.darwin.securityservice.exceptions.UserAlreadyExistsException;
 import sk.codexa.darwin.securityservice.exceptions.UserNotFoundException;
 import sk.codexa.darwin.securityservice.model.Person;
@@ -13,15 +19,12 @@ import java.util.Collection;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
 @RequestMapping("/api")
-//@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin
 public class PersonController {
 
     private final UserService userService;
@@ -31,9 +34,9 @@ public class PersonController {
         this.userService = userService;
     }
 
-    //@Secured({"Admin", "Tenant Admin"})
-    @RequestMapping(value = "/createUser", method = POST, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response> addTenantAdmin(/*@AuthenticationPrincipal User user, */@RequestBody Person
+    @Secured({"ROLE_ADMIN", "ROLE_TENANT_ADMIN"})
+    @RequestMapping(value = "/user", method = POST, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> addUser(@AuthenticationPrincipal User user, @RequestBody Person
             person) {
 
         //TODO check if user has rights to manipulate person
@@ -42,21 +45,18 @@ public class PersonController {
             throw new UserAlreadyExistsException(person.getLogin());
         }
 
-        Person newPerson = userService.addUser(person);
-        if (newPerson == null) {
-            return new ResponseEntity<>(new Response("failure"), UNAUTHORIZED);
-        }
+        userService.addUser(person);
 
-        return new ResponseEntity<>(new Response("success"), OK);
+        return new ResponseEntity<>(user, OK);
     }
 
-    //@Secured({"Admin"})
+    @Secured({"ROLE_ADMIN", "ROLE_TENANT_ADMIN"})
     @RequestMapping(value = "/users", method = GET, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<Person>> getAllUsers() {
         return new ResponseEntity<>(userService.getAllUsers(), OK);
     }
 
-    //@Secured({"Admin"})
+    @Secured({"ROLE_ADMIN", "ROLE_TENANT_ADMIN"})
     @RequestMapping(value = "/users/{login}", method = GET, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Person> getUser(@PathVariable String login) {
         Optional<Person> person = userService.findByLogin(login);
@@ -68,7 +68,7 @@ public class PersonController {
         }
     }
 
-    //@Secured({"Admin", "Tenant Admin", "Tenant", "Guest"})
+    @Secured({"ROLE_ADMIN", "ROLE_TENANT_ADMIN"})
     @RequestMapping(value = "/rights/{login}", method = GET, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Building> getRightsForUser(@PathVariable String login) {
 
@@ -81,9 +81,9 @@ public class PersonController {
         }
     }
 
-    //@Secured({"Admin", "Tenant Admin"})
-    @RequestMapping(value = "/deleteUser/{login}", method = DELETE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response> deleteTenantAdmin(/*@AuthenticationPrincipal User user,*/ @PathVariable String
+    @Secured({"ROLE_ADMIN"})
+    @RequestMapping(value = "/user/{login}", method = DELETE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response> deleteUser(@AuthenticationPrincipal User user, @PathVariable String
             login) {
         if (userService.findByLogin(login).isPresent()) {
             userService.delete(login);
