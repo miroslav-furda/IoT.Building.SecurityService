@@ -1,6 +1,7 @@
 package sk.codexa.darwin.securityservice.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
 import sk.codexa.darwin.securityservice.model.Person;
@@ -16,17 +17,20 @@ public class UserServiceImpl implements UserService {
 
     private final PersonRepository personRepository;
     private final InMemoryUserDetailsManager inMemoryUserDetailsManager;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(PersonRepository personRepository, InMemoryUserDetailsManager inMemoryUserDetailsManager) {
+    public UserServiceImpl(PersonRepository personRepository, InMemoryUserDetailsManager inMemoryUserDetailsManager,
+                           PasswordEncoder passwordEncoder) {
         this.personRepository = personRepository;
         this.inMemoryUserDetailsManager = inMemoryUserDetailsManager;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public Person addUser(Person person) {
         inMemoryUserDetailsManager.createUser(withUsername(person.getLogin()).password
-                (person.getPassword()).roles(person.getRole().toString()).build());
+                (passwordEncoder.encode(person.getPassword())).roles(person.getRole().toString()).build());
 
         return personRepository.save(person);
     }

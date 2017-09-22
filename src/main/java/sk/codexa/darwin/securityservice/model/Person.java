@@ -1,5 +1,6 @@
 package sk.codexa.darwin.securityservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,7 @@ public class Person implements Serializable {
 
     @Column(unique = true)
     private String login;
+    @JsonIgnore
     private String password;
 
     @OneToOne(cascade = ALL)
@@ -36,4 +38,6 @@ public class Person implements Serializable {
         this.building = building;
         this.password = password;
     }
+
+
 }

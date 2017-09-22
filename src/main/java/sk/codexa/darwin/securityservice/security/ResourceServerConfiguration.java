@@ -17,5 +17,6 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .and()
                 .authorizeRequests()
                 .anyRequest().authenticated();
+                //.and().requiresChannel().anyRequest().requiresSecure();
     }
 }
