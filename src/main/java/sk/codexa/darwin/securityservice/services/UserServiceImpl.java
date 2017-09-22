@@ -1,6 +1,7 @@
 package sk.codexa.darwin.securityservice.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
 import sk.codexa.darwin.securityservice.model.Person;
 import sk.codexa.darwin.securityservice.repositories.PersonRepository;
@@ -8,26 +9,25 @@ import sk.codexa.darwin.securityservice.repositories.PersonRepository;
 import java.util.Collection;
 import java.util.Optional;
 
+import static org.springframework.security.core.userdetails.User.withUsername;
+
 @Service
 public class UserServiceImpl implements UserService {
 
     private final PersonRepository personRepository;
-   // private final UserDetailsService userDetailsService;
+    private final InMemoryUserDetailsManager inMemoryUserDetailsManager;
 
     @Autowired
-    public UserServiceImpl(PersonRepository personRepository/*, UserDetailsService userDetailsService*/) {
+    public UserServiceImpl(PersonRepository personRepository, InMemoryUserDetailsManager inMemoryUserDetailsManager) {
         this.personRepository = personRepository;
-       // this.userDetailsService = userDetailsService;
+        this.inMemoryUserDetailsManager = inMemoryUserDetailsManager;
     }
 
     @Override
     public Person addUser(Person person) {
-        //TODO find better solution
-        /*if (userDetailsService instanceof InMemoryUserDetailsManager){
-            InMemoryUserDetailsManager inMemory = (InMemoryUserDetailsManager) userDetailsService;
-            inMemory.createUser(withUsername(person.getLogin()).password
-                    (person.getPassword()).roles(person.getRole().toString()).build());
-        }*/
+        inMemoryUserDetailsManager.createUser(withUsername(person.getLogin()).password
+                (person.getPassword()).roles(person.getRole().toString()).build());
+
         return personRepository.save(person);
     }
 
@@ -52,5 +52,6 @@ public class UserServiceImpl implements UserService {
     public void delete(String login) {
         Optional<Person> person = personRepository.findByLogin(login);
         person.ifPresent(personRepository::delete);
+        person.ifPresent(p -> inMemoryUserDetailsManager.deleteUser(p.getLogin()));
     }
 }

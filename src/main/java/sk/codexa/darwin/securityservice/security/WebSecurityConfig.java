@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import sk.codexa.darwin.securityservice.db.TempDatabaseInitializer;
 import sk.codexa.darwin.securityservice.repositories.PersonRepository;
 
 @Configuration
@@ -16,9 +17,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PersonRepository personRepository;
 
+    //TODO change in memory database to production database server
+    //private final DataSource dataSource;
+    private final TempDatabaseInitializer initializer;
+
     @Autowired
-    public WebSecurityConfig(PersonRepository personRepository) {
+    public WebSecurityConfig(PersonRepository personRepository,TempDatabaseInitializer
+            initializer) {
         this.personRepository = personRepository;
+        this.initializer = initializer;
     }
 
     @Override
@@ -39,7 +46,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    public InMemoryUserDetailsManager userDetailsService() {
+        //TODO remove
+        initializer.createTempUsers();
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
         personRepository.findAll().forEach(person -> manager.createUser(User.withUsername(person.getLogin()).password
                 (person.getPassword()).roles(person.getRole().toString()).build()));

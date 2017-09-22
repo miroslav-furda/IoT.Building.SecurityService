@@ -9,7 +9,6 @@ import sk.codexa.darwin.securityservice.model.building.Floor;
 import sk.codexa.darwin.securityservice.model.building.Office;
 import sk.codexa.darwin.securityservice.repositories.PersonRepository;
 
-import javax.annotation.PostConstruct;
 import java.util.HashSet;
 
 import static java.util.Arrays.asList;
@@ -28,8 +27,7 @@ public class TempDatabaseInitializer {
         this.personRepository = personRepository;
     }
 
-    @PostConstruct
-    public void createTempUsers() throws Exception {
+    public void createTempUsers() {
         personRepository.save(new Person(ADMIN, "Jaro", "12345", createBuilding("building1")));
 
         personRepository.save(new Person(TENANT_ADMIN, "Peter", "12345", createBuilding("building1")));
