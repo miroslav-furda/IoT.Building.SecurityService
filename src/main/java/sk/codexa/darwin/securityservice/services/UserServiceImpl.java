@@ -29,8 +29,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Person addUser(Person person) {
+        person.setPassword(passwordEncoder.encode(person.getPassword()));
+
         inMemoryUserDetailsManager.createUser(withUsername(person.getLogin()).password
-                (passwordEncoder.encode(person.getPassword())).roles(person.getRole().toString()).build());
+                (person.getPassword()).roles(person.getRole().toString()).build());
+
 
         return personRepository.save(person);
     }

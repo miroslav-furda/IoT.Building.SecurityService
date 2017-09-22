@@ -38,6 +38,4 @@ public class Person implements Serializable {
         this.building = building;
         this.password = password;
     }
-
-
 }

@@ -24,6 +24,7 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
         this.passwordEncoder = passwordEncoder;
     }
 
+    //TODO encode secret, than manually encode in iot-ui
     /*@Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security.passwordEncoder(passwordEncoder);

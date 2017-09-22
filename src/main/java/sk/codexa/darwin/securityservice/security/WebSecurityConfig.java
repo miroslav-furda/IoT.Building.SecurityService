@@ -65,7 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
         personRepository.findAll().forEach(person -> manager.createUser(User.withUsername(person.getLogin()).password
-                (passwordEncoder.encode(person.getPassword())).roles(person.getRole().toString()).build()));
+                (person.getPassword()).roles(person.getRole().toString()).build()));
 
         return manager;
     }

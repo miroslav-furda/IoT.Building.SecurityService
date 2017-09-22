@@ -1,6 +1,7 @@
 package sk.codexa.darwin.securityservice.db;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import sk.codexa.darwin.securityservice.model.Person;
 import sk.codexa.darwin.securityservice.model.building.Building;
@@ -28,15 +29,19 @@ public class TempDatabaseInitializer {
     }
 
     public void createTempUsers() {
-        personRepository.save(new Person(ADMIN, "Jaro", "12345", createBuilding("building1")));
+        personRepository.save(new Person(ADMIN, "Jaro", encodePassword("12345"), createBuilding("building1")));
 
-        personRepository.save(new Person(TENANT_ADMIN, "Peter", "12345", createBuilding("building1")));
-        personRepository.save(new Person(TENANT_ADMIN, "Marian", "12345", createBuilding("building1")));
-        personRepository.save(new Person(TENANT_ADMIN, "Lukas", "12345", createBuilding("building1")));
-        personRepository.save(new Person(TENANT_ADMIN, "Miro", "12345", createBuilding("building1")));
+        personRepository.save(new Person(TENANT_ADMIN, "Peter", encodePassword("12345"), createBuilding("building1")));
+        personRepository.save(new Person(TENANT_ADMIN, "Marian", encodePassword("12345"), createBuilding("building1")));
+        personRepository.save(new Person(TENANT_ADMIN, "Lukas", encodePassword("12345"), createBuilding("building1")));
+        personRepository.save(new Person(TENANT_ADMIN, "Miro", encodePassword("12345"), createBuilding("building1")));
 
-        personRepository.save(new Person(TENANT, "Miso", "12345", createBuilding("building1")));
-        personRepository.save(new Person(GUEST, "Zuzana", "12345", createBuilding("building1")));
+        personRepository.save(new Person(TENANT, "Miso", encodePassword("12345"), createBuilding("building1")));
+        personRepository.save(new Person(GUEST, "Zuzana", encodePassword("12345"), createBuilding("building1")));
+    }
+
+    private String encodePassword(String password){
+        return new BCryptPasswordEncoder().encode(password);
     }
 
     private Building createBuilding(String name) {
