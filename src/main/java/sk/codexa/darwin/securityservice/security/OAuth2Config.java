@@ -46,3 +46,21 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
                 .userDetailsService(userDetailsService);
     }
 }
+
+/*@FrameworkEndpoint
+class RevokeTokenEndpoint {
+
+    @Autowired
+    @Qualifier("consumerTokenServices")
+    ConsumerTokenServices tokenServices;
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/oauth/token")
+    @ResponseBody
+    public void revokeToken(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.contains("Bearer")){
+            String tokenId = authorization.substring("Bearer".length()+1);
+            tokenServices.revokeToken(tokenId);
+        }
+    }
+}*/

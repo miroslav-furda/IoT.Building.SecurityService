@@ -24,7 +24,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
 @RequestMapping("/api")
-//@CrossOrigin
 public class PersonController {
 
     private final UserService userService;
