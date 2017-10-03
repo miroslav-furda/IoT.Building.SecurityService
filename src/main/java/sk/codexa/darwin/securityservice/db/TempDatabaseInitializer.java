@@ -3,16 +3,21 @@ package sk.codexa.darwin.securityservice.db;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import sk.codexa.darwin.securityservice.model.Client;
 import sk.codexa.darwin.securityservice.model.Person;
 import sk.codexa.darwin.securityservice.model.building.Building;
 import sk.codexa.darwin.securityservice.model.building.Department;
 import sk.codexa.darwin.securityservice.model.building.Floor;
 import sk.codexa.darwin.securityservice.model.building.Office;
+import sk.codexa.darwin.securityservice.repositories.ClientRepository;
 import sk.codexa.darwin.securityservice.repositories.PersonRepository;
 
 import java.util.HashSet;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
+import static java.util.stream.Collectors.toSet;
 import static sk.codexa.darwin.securityservice.model.Role.*;
 
 /**
@@ -22,10 +27,19 @@ import static sk.codexa.darwin.securityservice.model.Role.*;
 public class TempDatabaseInitializer {
 
     private final PersonRepository personRepository;
+    private final ClientRepository clientRepository;
 
     @Autowired
-    public TempDatabaseInitializer(PersonRepository personRepository) {
+    public TempDatabaseInitializer(PersonRepository personRepository, ClientRepository clientRepository) {
         this.personRepository = personRepository;
+        this.clientRepository = clientRepository;
+    }
+
+    public void createClients() {
+        clientRepository.save(new Client("iot-ui", encodePassword("iotuisecret"), singleton("webclient"),
+                Stream.of("refresh_token", "password", "client_credentials").collect(toSet())));
+        clientRepository.save(new Client("darwin-ui", encodePassword("darwinuisecret"), singleton("webclient"),
+                Stream.of("refresh_token", "password", "client_credentials").collect(toSet())));
     }
 
     public void createTempUsers() {
@@ -40,7 +54,7 @@ public class TempDatabaseInitializer {
         personRepository.save(new Person(GUEST, "Zuzana", encodePassword("12345"), createBuilding("building1")));
     }
 
-    private String encodePassword(String password){
+    private String encodePassword(String password) {
         return new BCryptPasswordEncoder().encode(password);
     }
 
