@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sk.codexa.darwin.securityservice.exceptions.UserAlreadyExistsException;
 import sk.codexa.darwin.securityservice.exceptions.UserNotFoundException;
 import sk.codexa.darwin.securityservice.model.Person;
 import sk.codexa.darwin.securityservice.model.building.Building;
@@ -35,18 +34,19 @@ public class PersonController {
 
     @Secured({"ROLE_ADMIN", "ROLE_TENANT_ADMIN"})
     @RequestMapping(value = "/user", method = POST, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> addUser(@AuthenticationPrincipal User user, @RequestBody Person
+    public ResponseEntity<Person> addUser(@AuthenticationPrincipal User user, @RequestBody Person
             person) {
 
         //TODO check if user has rights to manipulate person
 
-        if (userService.findByLogin(person.getLogin()).isPresent()){
+        //TODO temporally commented
+        /*if (userService.findByLogin(person.getLogin()).isPresent()){
             throw new UserAlreadyExistsException(person.getLogin());
-        }
+        }*/
 
         userService.addUser(person);
 
-        return new ResponseEntity<>(user, OK);
+        return new ResponseEntity<>(person, OK);
     }
 
     @Secured({"ROLE_ADMIN", "ROLE_TENANT_ADMIN"})

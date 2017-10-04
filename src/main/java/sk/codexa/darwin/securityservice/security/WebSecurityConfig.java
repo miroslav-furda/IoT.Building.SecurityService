@@ -8,7 +8,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -18,13 +17,12 @@ import org.springframework.web.filter.CorsFilter;
 import sk.codexa.darwin.securityservice.db.TempDatabaseInitializer;
 import sk.codexa.darwin.securityservice.repositories.PersonRepository;
 
+import static org.springframework.security.core.userdetails.User.withUsername;
+
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PersonRepository personRepository;
-
-    //TODO change in memory database to production database server
-    //private final DataSource dataSource;
     private final TempDatabaseInitializer initializer;
     private final PasswordEncoder passwordEncoder;
 
@@ -90,7 +88,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         initializer.createTempUsers();
 
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        personRepository.findAll().forEach(person -> manager.createUser(User.withUsername(person.getLogin()).password
+        personRepository.findAll().forEach(person -> manager.createUser(withUsername(person.getLogin()).password
                 (person.getPassword()).roles(person.getRole().toString()).build()));
 
         return manager;
