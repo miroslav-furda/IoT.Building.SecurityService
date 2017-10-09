@@ -58,7 +58,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(String login) {
         Optional<Person> person = personRepository.findByLogin(login);
-        person.ifPresent(personRepository::delete);
-        person.ifPresent(p -> inMemoryUserDetailsManager.deleteUser(p.getLogin()));
+        person.ifPresent(p -> {
+            inMemoryUserDetailsManager.deleteUser(p.getLogin());
+            personRepository.delete(p);
+        });
     }
 }
